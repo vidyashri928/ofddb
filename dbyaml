@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "onlinefd"
+  namespace: "default"
+  labels:
+    app10: "onlinefd"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app10: "onlinefd"
+  template:
+    metadata:
+      labels:
+        app10: "onlinefd"
+    spec:
+      containers:
+      - name: "ofddb-sha256-1"
+        image: "gcr.io/charged-ground-326209/github.com/vidyashri928/ofddb@sha256:7776803b644726f01616171634dabb0d81ba8569eb826670445a9b8dedcd5612"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "onlinefd-hpa-cnfv"
+  namespace: "default"
+  labels:
+    app10: "onlinefd"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "onlinefd"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
