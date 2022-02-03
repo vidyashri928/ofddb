@@ -1,0 +1,41 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "ofd"
+  namespace: "default"
+  labels:
+    app: "ofd"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: "ofd"
+  template:
+    metadata:
+      labels:
+        app: "ofd"
+    spec:
+      containers:
+      - name: "nginx-1"
+        image: "nginx:latest"
+---
+apiVersion: "autoscaling/v2beta1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "ofd-hpa-t7gb"
+  namespace: "default"
+  labels:
+    app: "ofd"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "ofd"
+    apiVersion: "apps/v1"
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: "Resource"
+    resource:
+      name: "cpu"
+      targetAverageUtilization: 80
